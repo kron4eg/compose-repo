@@ -37,7 +37,10 @@ func syncCmd(c *cli.Context) {
 
 	repos := unmarshalRepos()
 	for i, rep := range repos {
-		log.Printf("syncing %s (%d/%d)\n", rep.Path, i+1, len(repos))
+		log.Printf("syncing %s (%d/%d)", rep.Path, i+1, len(repos))
+		if rep.Branch == "" {
+			rep.Branch = "master"
+		}
 
 		if RepoExists(rep) {
 			remoteArgs := []string{}
@@ -46,9 +49,10 @@ func syncCmd(c *cli.Context) {
 			}
 
 			rep = rep.RemoteUpdate(remoteArgs...)
+			rep = rep.Checkout(rep.Branch)
 
 			if c.Bool("hard") {
-				rep = rep.Reset(defaultRemote)
+				rep = rep.Reset("origin/" + rep.Branch)
 			}
 		} else {
 			rep = rep.Clone()

@@ -8,13 +8,18 @@ import (
 )
 
 type Repo struct {
-	Path  string `json:"path"`
-	URL   string `json:"url"`
-	queue []exec.Cmd
+	Path   string `json:"path"`
+	Branch string `json:"branch"`
+	URL    string `json:"url"`
+	queue  []exec.Cmd
 }
 
 func (r Repo) Checkout(branch string) Repo {
-	return r.new()
+	rep := r.new()
+	cmd := Git("checkout", branch)
+	cmd.Dir = rep.Path
+	rep.queue = append(rep.queue, cmd)
+	return rep
 }
 
 func (r Repo) Clone() Repo {
@@ -57,6 +62,7 @@ func (r Repo) Run() {
 func (rep Repo) Commit(r io.Reader, w io.Writer, e io.Writer) error {
 	for _, c := range rep.queue {
 		c.Stdin, c.Stdout, c.Stderr = r, w, e
+		// log.Printf("%s %s", c.Path, c.Args)
 		if err := c.Run(); err != nil {
 			return err
 		}
@@ -66,9 +72,10 @@ func (rep Repo) Commit(r io.Reader, w io.Writer, e io.Writer) error {
 
 func (r Repo) new() Repo {
 	rep := Repo{
-		Path:  r.Path,
-		URL:   r.URL,
-		queue: make([]exec.Cmd, len(r.queue)),
+		Path:   r.Path,
+		URL:    r.URL,
+		Branch: r.Branch,
+		queue:  make([]exec.Cmd, len(r.queue)),
 	}
 	copy(rep.queue, r.queue)
 	return rep
