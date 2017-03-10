@@ -4,7 +4,7 @@
 
     $ brew install https://raw.githubusercontent.com/kron4eg/compose-repo/master/compose-repo.rb
 
-Or simly:
+Or simply:
 
     $ go get -u github.com/kron4eg/compose-repo
 
