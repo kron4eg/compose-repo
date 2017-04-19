@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 const (
@@ -42,7 +42,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "composer-repo"
 	app.Usage = "sync multiple git repos"
-	app.Version = "0.0.1"
+	app.Version = "0.0.6"
 	app.Commands = []cli.Command{
 		{
 			Name:        "init",
@@ -64,9 +64,25 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "hard,r",
-					Usage: "use `git reset --hard` to update",
+					Usage: "uses git reset --hard to update",
 				},
 				cli.BoolFlag{
+					Name:  "prune,p",
+					Usage: "prune all the remotes that are updated",
+				},
+			},
+		},
+		{
+			Name:        "fsync",
+			Usage:       "alias to sync -r -p",
+			Description: "",
+			Action:      syncCmd,
+			Flags: []cli.Flag{
+				cli.BoolTFlag{
+					Name:  "hard,r",
+					Usage: "uses git reset --hard to update",
+				},
+				cli.BoolTFlag{
 					Name:  "prune,p",
 					Usage: "prune all the remotes that are updated",
 				},
